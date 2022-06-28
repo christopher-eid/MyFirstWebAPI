@@ -16,7 +16,9 @@ namespace MyFirstWebAPI.Services;
 public class StudentHelper : IStudentHelper
 {
 
-
+    /*
+    public const Student = new Student(0 , "none", "none");
+    */
 
 
     public List<Student> GetAllStudentsHelper(List<Student> stds)
@@ -32,7 +34,7 @@ public class StudentHelper : IStudentHelper
 
 
 
-    public Student GetStudentByIdHelper(long id, List<Student> stds)
+    public Student GetStudentByIdHelper(int id, List<Student> stds)
     {
 
         try
@@ -61,8 +63,7 @@ public class StudentHelper : IStudentHelper
 
     }
 
-//push
-
+    
 
     public List<Student> GetStudentsByNameHelper(string enteredName, List<Student> stds)
     {
@@ -70,7 +71,7 @@ public class StudentHelper : IStudentHelper
         List<Student> studentsFound = new List<Student>();
         foreach (Student std in stds)
         {
-            if (String.Compare(std.Name, enteredName) == 0)
+            if (String.Equals(std.Name, enteredName, StringComparison.CurrentCultureIgnoreCase)) //compares names with case INSENSITIVE
             {
                 studentsFound.Add(std);
             }
@@ -108,4 +109,35 @@ public class StudentHelper : IStudentHelper
 
 
     }
+
+
+    
+    public List<Student> ChangeStudentNameHelper(Student stdToFind, List<Student> stds)
+    {
+
+        bool found = false;
+        foreach (Student std in stds)
+        {   
+            if (std.Id == stdToFind.Id && String.Equals(std.Email, stdToFind.Email, StringComparison.CurrentCultureIgnoreCase)) //checks for both id and email
+            {
+                std.Name = stdToFind.Name;
+                found = true;
+
+            }
+        }
+
+        if (!found)
+        {
+            //throw error in case we did not find the student
+
+        }
+        return stds;
+      
+    }
+
+
+
+
+
+
 }
