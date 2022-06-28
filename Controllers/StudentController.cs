@@ -21,22 +21,16 @@ public class StudentController : ControllerBase
         {
             new Student()
             {
-                Id = 1,
-                Email = "chris.302@outlook.com",
-                Name = "chris"
+                Id = 1, Email = "chris.302@outlook.com", Name = "chris"
             },
             new Student()
             {
-                Id = 2,
-                Email = "chris.312@outlook.com",
-                Name = "chris"
-            },
+                Id = 2, Email = "sarah.302@outlook.com", Name = "sarah"
+            }, 
             new Student()
             {
-                Id = 3,
-                Email = "sarah.302@gmail.com",
-                Name = "sarah"
-            }
+                Id = 3, Email = "elie.302@outlook.com", Name = "elie"
+            },
         };
     }
 
@@ -48,7 +42,7 @@ public class StudentController : ControllerBase
  
     
     [HttpGet("GetStudentById~/{id}")]
-    public async Task<Student> GetStudentById([FromRoute] long id )
+    public async Task<Student> GetStudentById([FromRoute] int id )
     {
        
         return _studentHelper.GetStudentByIdHelper(id, Students);
@@ -69,32 +63,24 @@ public class StudentController : ControllerBase
         return _studentHelper.GetDateHelper(format);
     }
     
-    
-    
-    
-    
-    
-    
-    
 
     [HttpPost("ChangeStudentName")]
-    public async Task<Student[]> ChangeStudentName([FromBody] Student request)
+    public async Task<List<Student>> ChangeStudentName([FromBody] Student request)
     {
-        
-        foreach (Student std in Students)
-        {   
-            if (std.Id == request.Id && std.Email == request.Email)
-            {
-                std.Name = request.Name;
-            }
-        }
-
-
-        return Students.ToArray();
+        return _studentHelper.ChangeStudentNameHelper(request, Students);
 
     }
 
-    
+
+    /*
+    [HttpPost("GetPhoto")]
+    public async Task<IFormFile> GetPhoto([FromForm] Student s)
+    {
+        
+        return s;
+    }
+    */
+
     /*
     private readonly ILogger<StudentController> _logger;
     */
