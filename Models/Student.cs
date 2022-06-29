@@ -4,11 +4,19 @@ namespace MyFirstWebAPI.Models;
 
 public class Student
 {
-    [Required] public int? Id { get; set; }
-    [Required]
+    [Required(ErrorMessage = "ID is required")]
+    [Range(0, int.MaxValue, ErrorMessage = "ID cannot be negative")]
+
+    public int? Id { get; set; }
+    [Required(ErrorMessage = "Name is required")]
+    [StringLength(30)]
 
     public string? Name { get; set; }
-    [Required]
+    
+    [Required(ErrorMessage = "Email is required")]
+    [StringLength(30)]
+    [EmailAddress(ErrorMessage = "Please enter a valid email address")]
+
     public string? Email { get; set; }
     
   

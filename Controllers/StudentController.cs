@@ -11,7 +11,7 @@ public class StudentController : ControllerBase
 {
     private IStudentHelper _studentHelper;
     
-    public static List<Student> Students;
+    public List<Student> Students;
 
     public StudentController(IStudentHelper studentHelper)
     {
@@ -67,13 +67,13 @@ public class StudentController : ControllerBase
     public async Task<List<Student>> ChangeStudentName([FromBody] Student request)
     {
         return _studentHelper.ChangeStudentNameHelper(request, Students);
-
+      
     }
 
 
     
     [HttpPost("UploadPhoto")]
-    public async Task<Image> UploadPhoto([FromForm] Image fileReceived)
+    public async Task<Object> UploadPhoto([FromForm] Image fileReceived)
     {
        return _studentHelper.UploadPhotoHelper(fileReceived);
        
