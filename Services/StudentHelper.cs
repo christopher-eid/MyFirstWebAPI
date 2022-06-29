@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using MyFirstWebAPI.Exceptions;
 using MyFirstWebAPI.Interfaces;
 using MyFirstWebAPI.Models;
@@ -15,9 +16,9 @@ namespace MyFirstWebAPI.Services;
 public class StudentHelper : IStudentHelper
 {
 
-    /*
-    public const Student = new Student(0 , "none", "none");
-    */
+    
+    public static readonly Student NotFound = new Student(){Id = 0, Name = "NOT_FOUND", Email = "NOT_FOUND"};
+    
 
 
     public List<Student> GetAllStudentsHelper(List<Student> stds)
@@ -36,6 +37,7 @@ public class StudentHelper : IStudentHelper
     public Student GetStudentByIdHelper(int id, List<Student> stds)
     {
 
+        Student returnedStudent = NotFound;
         try
         {
 
@@ -43,11 +45,11 @@ public class StudentHelper : IStudentHelper
             {
                 if (std.Id == id)
                 {
-                    return std;
+                    returnedStudent = std;
                 }
             }
 
-
+            
             throw new StudentNotFoundException("Student Not Found");
         }
         catch (StudentNotFoundException e)
@@ -57,7 +59,7 @@ public class StudentHelper : IStudentHelper
 
         }
 
-        return new Student() {Id = 0 , Email = "none", Name = "none"};
+        return returnedStudent; //returnedStudent will either be the student we found or the "notFound" student 
 
 
     }
@@ -75,36 +77,46 @@ public class StudentHelper : IStudentHelper
                 studentsFound.Add(std);
             }
         }
-
+        //no need to throw exception if no students found since it will return an empty list
         return studentsFound;
     }
 
 
     public string GetDateHelper(string format)
     {
-
-        DateTime myDate = DateTime.Now;
         string s = "error";
-        switch (format)
+
+        try
         {
-            case "en-US":
-                s = myDate.ToString(new CultureInfo("en-US"));
-                break;
-            case "es-ES":
-                s = myDate.ToString(new CultureInfo("es-ES"));
-                break;
-            case "fr-FR":
-                s = myDate.ToString(new CultureInfo("fr-FR"));
-                break;
-            default:
-                //throw exception here
-                break;
+            DateTime myDate = DateTime.Now;
+            bool supported = false;
+            foreach (CultureInfo c in CultureInfo.GetCultures(CultureTypes.AllCultures)) //going through all cultures to check if the entered format is supported
+            {
+                if (String.Equals(c.ToString(), format))
+                {
+                    supported = true;
+                }
+            }
+
+            //Array.IndexOf(CultureInfo.GetCultures(CultureTypes.AllCultures), format) > -1
+            if (supported)
+            {
+                s = myDate.ToString(new CultureInfo(format));
+            }
+            else
+            {
+                s = "This Culture Format is not supported";
+                throw new NotSupportedException("This Culture Format is Not supported");
+
+            }
+
+        }
+        catch (NotSupportedException e)
+        {
+            Console.WriteLine("Error: {0}", e);
         }
 
-        
         return s;
-
-
 
 
     }
@@ -113,60 +125,100 @@ public class StudentHelper : IStudentHelper
     
     public List<Student> ChangeStudentNameHelper(Student stdToFind, List<Student> stds)
     {
-
-        bool found = false;
-        foreach (Student std in stds)
-        {   
-            if (std.Id == stdToFind.Id && String.Equals(std.Email, stdToFind.Email, StringComparison.CurrentCultureIgnoreCase)) //checks for both id and email
+        try
+        {
+            bool found = false;
+            foreach (Student std in stds)
             {
-                std.Name = stdToFind.Name;
-                found = true;
+                if (std.Id == stdToFind.Id &&
+                    String.Equals(std.Email, stdToFind.Email,
+                        StringComparison.CurrentCultureIgnoreCase)) //checks for both id and email
+                {
+                    std.Name = stdToFind.Name;
+                    found = true;
+
+                }
+            }
+
+            if (!found)
+            {
+                throw new StudentNotFoundException("Requested student was not found");
 
             }
         }
-
-        if (!found)
+        catch (StudentNotFoundException e)
         {
-            //throw error in case we did not find the student
-
+            Console.WriteLine("Error: {0}", e);
         }
-        return stds;
-      
+
+
+        return stds; //no need to return an error since the user will notice himself that student name did not change
     }
 
 
-    public Image UploadPhotoHelper(Image fileReceived)
+    public Object UploadPhotoHelper(Image fileReceived)
     {
-        
-        string pathToStore = Path.Combine(Directory.GetCurrentDirectory(),"wwwroot\\Images", fileReceived.imageContent.FileName);
-        string fileType = Path.GetExtension(fileReceived.imageContent.FileName);
-        string[] allowedTypes = new string[] { ".JPG", ".JPEG", ".RAW" };
-        if (Array.IndexOf(allowedTypes, fileType) > -1)
+        try
         {
-            
-            
-            using (var uploading = new FileStream(pathToStore, FileMode.Create))
+            string pathToStore = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Images",
+                fileReceived.imageContent.FileName);
+            string fileType = Path.GetExtension(fileReceived.imageContent.FileName);
+            string[] allowedTypes = new string[] { ".JPG", ".JPEG", ".RAW" };
+            if (Array.IndexOf(allowedTypes, fileType) > -1)
             {
-                fileReceived.imageContent.CopyToAsync(uploading);
+
+
+                using (var uploading = new FileStream(pathToStore, FileMode.Create))
+                {
+                    fileReceived.imageContent.CopyToAsync(uploading);
+                }
+
+                return fileReceived;
             }
+
+            throw new NotSupportedException("Please enter a file of the following types: jpg - jpeg - raw");
         }
-        
-        return fileReceived;
+        catch (NotSupportedException e)
+        {
+            Console.WriteLine("Error: {0}", e);
+        }
+
+        return "Please enter a file of the following types: jpg - jpeg - raw";
     }
 
 
     public Student DeleteStudentHelper(int id, List<Student> stds)
     {
-        foreach (Student std in stds)
+        Student returnedStudent = NotFound;
+        bool found = false;
+        try
         {
-            if (std.Id == id)
+            foreach (Student std in stds)
             {
-                stds.Remove(std);
-                return std;
+                if (std.Id == id)
+                {
+                    returnedStudent = std;
+                    found = true;
+                    stds.Remove(std);
+                    break; //use break since after deleting student from the list, if we continue the loop we will have an error "collection is modified"
+                }
             }
-        }
 
-        return new Student() { Id = 0, Email = "none", Name = "none" };
+            if (!found)
+            {
+                throw new StudentNotFoundException("Requested student was not found");
+            }
+
+        }
+        catch (StudentNotFoundException e)
+        {
+            Console.WriteLine("Error: {0}", e); 
+        }
+        
+        return returnedStudent;
+        
+
+        
     }
 
 }
