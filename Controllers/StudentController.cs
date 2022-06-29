@@ -1,7 +1,5 @@
-using System.Globalization;
-using System.Reflection;
+
 using Microsoft.AspNetCore.Mvc;
-using MyFirstWebAPI.Exceptions;
 using MyFirstWebAPI.Interfaces;
 using MyFirstWebAPI.Models;
 
@@ -13,7 +11,7 @@ public class StudentController : ControllerBase
 {
     private IStudentHelper _studentHelper;
     
-    public  List<Student> Students;
+    public static List<Student> Students;
 
     public StudentController(IStudentHelper studentHelper)
     {
@@ -42,7 +40,7 @@ public class StudentController : ControllerBase
     }
  
     
-    [HttpGet("GetStudentById~/{id}")]
+    [HttpGet("GetStudentById/{id}")]
     public async Task<Student> GetStudentById([FromRoute] int id )
     {
        
@@ -80,8 +78,12 @@ public class StudentController : ControllerBase
        return _studentHelper.UploadPhotoHelper(fileReceived);
        
     }
-    
 
+    [HttpDelete("DeleteStudent/{id}")]
+    public async Task<Student> DeleteStudent([FromRoute]int id)
+    {
+        return _studentHelper.DeleteStudentHelper(id, Students);
+    }
     /*
     private readonly ILogger<StudentController> _logger;
     */

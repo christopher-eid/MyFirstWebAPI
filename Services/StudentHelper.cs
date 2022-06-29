@@ -155,5 +155,18 @@ public class StudentHelper : IStudentHelper
     }
 
 
+    public Student DeleteStudentHelper(int id, List<Student> stds)
+    {
+        foreach (Student std in stds)
+        {
+            if (std.Id == id)
+            {
+                stds.Remove(std);
+                return std;
+            }
+        }
+
+        return new Student() { Id = 0, Email = "none", Name = "none" };
+    }
 
 }
