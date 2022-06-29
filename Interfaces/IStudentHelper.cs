@@ -15,4 +15,6 @@ public interface IStudentHelper
     public List<Student> ChangeStudentNameHelper(Student stdToFind, List<Student> stds);
 
     public Image UploadPhotoHelper(Image fileReceived);
+
+    public Student DeleteStudentHelper(int id, List<Student> stds);
 }
