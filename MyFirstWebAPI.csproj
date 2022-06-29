@@ -12,6 +12,7 @@
 
     <ItemGroup>
       <Folder Include="wwwroot\css" />
+      <Folder Include="wwwroot\Images" />
       <Folder Include="wwwroot\jss" />
       <Folder Include="wwwroot\lib" />
     </ItemGroup>
