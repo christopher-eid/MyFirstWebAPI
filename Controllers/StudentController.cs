@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using MyFirstWebAPI.Exceptions;
 using MyFirstWebAPI.Interfaces;
@@ -72,14 +73,14 @@ public class StudentController : ControllerBase
     }
 
 
-    /*
-    [HttpPost("GetPhoto")]
-    public async Task<IFormFile> GetPhoto([FromForm] Student s)
+    
+    [HttpPost("UploadPhoto")]
+    public async Task<Image> UploadPhoto([FromForm] Image fileReceived)
     {
-        
-        return s;
+       return _studentHelper.UploadPhotoHelper(fileReceived);
+       
     }
-    */
+    
 
     /*
     private readonly ILogger<StudentController> _logger;

@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using MyFirstWebAPI.Controllers;
 using MyFirstWebAPI.Exceptions;
 using MyFirstWebAPI.Interfaces;
 using MyFirstWebAPI.Models;
@@ -58,7 +57,7 @@ public class StudentHelper : IStudentHelper
 
         }
 
-        return null;
+        return new Student() {Id = 0 , Email = "none", Name = "none"};
 
 
     }
@@ -136,7 +135,24 @@ public class StudentHelper : IStudentHelper
     }
 
 
-
+    public Image UploadPhotoHelper(Image fileReceived)
+    {
+        
+        string pathToStore = Path.Combine(Directory.GetCurrentDirectory(),"wwwroot\\Images", fileReceived.imageContent.FileName);
+        string fileType = Path.GetExtension(fileReceived.imageContent.FileName);
+        string[] allowedTypes = new string[] { ".JPG", ".JPEG", ".RAW" };
+        if (Array.IndexOf(allowedTypes, fileType) > -1)
+        {
+            
+            
+            using (var uploading = new FileStream(pathToStore, FileMode.Create))
+            {
+                fileReceived.imageContent.CopyToAsync(uploading);
+            }
+        }
+        
+        return fileReceived;
+    }
 
 
 
